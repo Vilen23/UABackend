@@ -1,35 +1,50 @@
-import { Request, Response } from "express";
+import "dotenv/config";
 import bcrypt from "bcrypt";
 import db from "../utils/db";
-import "dotenv/config";
+import DeviceDetector from "device-detector-js";
+import { Request, Response } from "express";
+import  WebSocket from "ws";
 
 export const Signin = async (req: Request, res: Response) => {
   const { credentials } = req.body;
-  const hashedpassword = await bcrypt.hash(credentials.password, 10);
+  const deviceDetector = new DeviceDetector();
+  const userAgent =
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36";
+  const Device = deviceDetector.parse(userAgent);
+  const wss: WebSocket.Server = req.app.get("wss");
 
+  const hashedpassword = await bcrypt.hash(credentials.password, 10);
   try {
-    const existingUser = await db.user.findFirst({
+    let user = await db.user.findFirst({
       where: {
         name: credentials.name,
       },
     });
-    if (existingUser) {
-      const check = await bcrypt.compare(
-        credentials.password,
-        existingUser.password
-      );
+    if (user) {
+      const check = await bcrypt.compare(credentials.password, user.password);
       if (!check) return res.status(401).json({ error: "Invalid credentials" });
-      const { password, ...userWithoutPassword } = existingUser;
-      return res.status(200).json(userWithoutPassword);
+    } else {
+      user = await db.user.create({
+        data: {
+          name: credentials.name,
+          password: hashedpassword,
+          email: credentials.email,
+        },
+      });
     }
-    const user = await db.user.create({
+    const device = await db.device.create({
       data: {
-        name: credentials.name,
-        password: hashedpassword,
-        email: credentials.email,
+        name: `${Device.client?.name} on ${Device.os?.name}`,
+        type: Device.device?.type || "Unknown",
+        userId: user.id,
       },
     });
     const { password, ...userWithoutPassword } = user;
+    wss.clients.forEach(function each(client) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ type: "device_added", device }));
+      }
+    });
     return res.status(200).json(userWithoutPassword);
   } catch (error) {
     console.log(error);

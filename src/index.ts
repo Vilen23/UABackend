@@ -1,14 +1,31 @@
-import express from 'express';
-import cors from 'cors'
-import Authentication from './routes/Authentication';
+import cors from "cors";
+import express from "express";
+import { WebSocketServer } from "ws";
+import Authentication from "./routes/Authentication";
+import DeviceHandler from "./routes/DeviceHandler";
+var useragent = require("express-useragent");
 
 const app = express();
+app.use(useragent.express());
 app.use(express.json());
-app.use(cors())
+app.use(cors());
 
-app.use('/api/auth',Authentication);
+const httpServer = app.listen(8000);
 
+const wss = new WebSocketServer({ server: httpServer });
 
-app.listen(8000, () => {
-  console.log('Server is running on port 8000');
+wss.on("connection", function (ws) {
+  ws.on("error", console.error);
+  ws.on("message", function message(data, isBinary) {
+    wss.clients.forEach(function each(client) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(data, { binary: isBinary });
+      }
+    });
+  });
+  ws.send(JSON.stringify({ type: "message", content: "WebSocket started" }));
 });
+
+app.set("wss", wss);
+app.use("/api/auth", Authentication);
+app.use("/api/devices", DeviceHandler);
