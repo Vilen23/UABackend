@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import db from "../utils/db";
 import DeviceDetector from "device-detector-js";
 import { Request, Response } from "express";
-import  WebSocket from "ws";
+import WebSocket from "ws";
 
 export const Signin = async (req: Request, res: Response) => {
   const { credentials } = req.body;
@@ -39,13 +39,19 @@ export const Signin = async (req: Request, res: Response) => {
         userId: user.id,
       },
     });
+    const session = await db.session.create({
+      data: {
+        userId: user.id,
+        deviceId: device.id,
+      },
+    });
     const { password, ...userWithoutPassword } = user;
     wss.clients.forEach(function each(client) {
       if (client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify({ type: "device_added", device }));
       }
     });
-    return res.status(200).json(userWithoutPassword);
+    return res.status(200).json({userWithoutPassword,session});
   } catch (error) {
     console.log(error);
   }

@@ -22,17 +22,29 @@ model User {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   devices       Device[]
+  session       Session[]
   TwofactorCode Twofactor[]
 }
 
 model Device {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String
   type      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  userId    String
+  session   Session[]
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  deviceId  String
+  user      User     @relation(fields: [userId], references: [id])
+  device    Device   @relation(fields: [deviceId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Twofactor {
