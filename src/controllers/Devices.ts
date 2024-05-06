@@ -27,7 +27,7 @@ export const removeDevice = async (req: Request, res: Response) => {
   const { deviceId } = req.query;
   const wss: WebSocket.Server = req.app.get("wss");
   try {
-    await db.$transaction(async (prisma) => {
+    await db.$transaction(async (db) => {
       const session = await db.session.findFirst({
         where: { deviceId: deviceId as string },
       });
