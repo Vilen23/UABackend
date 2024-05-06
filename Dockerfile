@@ -2,9 +2,11 @@ FROM node:20 AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
+RUN tsc -b
 COPY ./prisma .
 RUN npx prisma generate
 COPY . .
+
 
 
 FROM node:20 AS final
