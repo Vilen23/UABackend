@@ -1,13 +1,12 @@
 FROM node:20 AS build
 WORKDIR /app
 COPY package*.json ./
+COPY tsconfig.json ./  
 RUN npm install
 RUN npm install -g typescript
-RUN tsc -b
-COPY ./prisma .
-RUN npx prisma generate
 COPY . .
-
+RUN tsc -b
+RUN npx prisma generate
 
 
 FROM node:20 AS final
