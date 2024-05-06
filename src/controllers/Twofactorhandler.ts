@@ -58,7 +58,7 @@ export const Twofactorhandler = async (req: Request, res: Response) => {
   }
 };
 
-export const check2Fa = async (req: Request, res: Response) => {
+export const  check2Fa = async (req: Request, res: Response) => {
  const {id} = req.query;
  try {
   const existingUser = await db.user.findFirst({

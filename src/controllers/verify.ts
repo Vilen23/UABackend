@@ -1,4 +1,3 @@
-import express from "express";
 import { Request,Response } from "express";
 import 'dotenv/config';
 const speakeasy = require("speakeasy");

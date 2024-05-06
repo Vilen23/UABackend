@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { Twofactorhandler, check2Fa, getToken } from '../controllers/Twofactorhandler';
 import { Signin } from '../controllers/Signin';
 import { verifyToken } from '../controllers/verify';
