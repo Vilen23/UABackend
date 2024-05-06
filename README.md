@@ -51,6 +51,10 @@ DATABASE_URL="{Your DB url}"
 ```sh
 npx prisma generate
 ```
+##Compile the src file
+```sh
+tsc -b
+```
 
 ## Start the server
 ```sh
