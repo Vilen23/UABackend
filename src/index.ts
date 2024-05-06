@@ -7,7 +7,7 @@ var useragent = require("express-useragent");
 
 const app = express();
 const corsOptions = {
-  origin: "https://your-frontend-domain.vercel.app",
+  origin: "https://user-activity-client.vercel.app/history",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   preflightContinue: false,
   optionsSuccessStatus: 204
