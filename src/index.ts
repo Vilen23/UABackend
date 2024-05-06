@@ -12,7 +12,7 @@ const corsOptions = {
 };
 app.use(useragent.express());
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 
 const httpServer = app.listen(8000);
 
