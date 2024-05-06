@@ -6,6 +6,10 @@ import DeviceHandler from "./routes/DeviceHandler";
 var useragent = require("express-useragent");
 
 const app = express();
+const corsOptions = {
+  origin: "https://user-activity-client.vercel.app/", 
+  optionsSuccessStatus: 200, 
+};
 app.use(useragent.express());
 app.use(express.json());
 app.use(cors());
