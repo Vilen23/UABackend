@@ -7,9 +7,12 @@ var useragent = require("express-useragent");
 
 const app = express();
 const corsOptions = {
-  origin: "https://user-activity-client.vercel.app/", 
-  optionsSuccessStatus: 200, 
+  origin: "https://your-frontend-domain.vercel.app",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
+
 app.use(useragent.express());
 app.use(express.json());
 app.use(cors(corsOptions));
